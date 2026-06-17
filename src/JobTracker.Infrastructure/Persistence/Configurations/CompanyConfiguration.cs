@@ -1,0 +1,24 @@
+﻿using JobTracker.Domain.Entities;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
+namespace JobTracker.Infrastructure.Persistence.Configurations;
+
+public sealed class CompanyConfiguration : IEntityTypeConfiguration<Company>
+{
+    public void Configure(EntityTypeBuilder<Company> builder)
+    {
+        builder.ToTable("Companies");
+        builder.HasKey(company => company.Id);
+
+        builder.Property(company => company.Name)
+            .HasMaxLength(200)
+            .IsRequired();
+
+        builder.Property(company => company.Website)
+            .HasMaxLength(500);
+
+        builder.Property(company => company.Location)
+            .HasMaxLength(200);
+    }
+}
