@@ -1,0 +1,16 @@
+C:\dotnet\JobTracker\src\JobTracker.Application\bin\Debug\net10.0\JobTracker.Application.deps.json
+C:\dotnet\JobTracker\src\JobTracker.Application\bin\Debug\net10.0\JobTracker.Application.dll
+C:\dotnet\JobTracker\src\JobTracker.Application\bin\Debug\net10.0\JobTracker.Application.pdb
+C:\dotnet\JobTracker\src\JobTracker.Application\bin\Debug\net10.0\JobTracker.Domain.dll
+C:\dotnet\JobTracker\src\JobTracker.Application\bin\Debug\net10.0\JobTracker.Domain.pdb
+C:\dotnet\JobTracker\src\JobTracker.Application\obj\Debug\net10.0\JobTracker.Application.csproj.AssemblyReference.cache
+C:\dotnet\JobTracker\src\JobTracker.Application\obj\Debug\net10.0\JobTracker.Application.GeneratedMSBuildEditorConfig.editorconfig
+C:\dotnet\JobTracker\src\JobTracker.Application\obj\Debug\net10.0\JobTracker.Application.AssemblyInfoInputs.cache
+C:\dotnet\JobTracker\src\JobTracker.Application\obj\Debug\net10.0\JobTracker.Application.AssemblyInfo.cs
+C:\dotnet\JobTracker\src\JobTracker.Application\obj\Debug\net10.0\JobTracker.Application.csproj.CoreCompileInputs.cache
+C:\dotnet\JobTracker\src\JobTracker.Application\obj\Debug\net10.0\JobTracker.Application.sourcelink.json
+C:\dotnet\JobTracker\src\JobTracker.Application\obj\Debug\net10.0\JobTrack.0DD19BD6.Up2Date
+C:\dotnet\JobTracker\src\JobTracker.Application\obj\Debug\net10.0\JobTracker.Application.dll
+C:\dotnet\JobTracker\src\JobTracker.Application\obj\Debug\net10.0\refint\JobTracker.Application.dll
+C:\dotnet\JobTracker\src\JobTracker.Application\obj\Debug\net10.0\JobTracker.Application.pdb
+C:\dotnet\JobTracker\src\JobTracker.Application\obj\Debug\net10.0\ref\JobTracker.Application.dll

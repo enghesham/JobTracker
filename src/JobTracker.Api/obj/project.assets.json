@@ -36,6 +36,43 @@
             "related": ".pdb;.xml"
           }
         }
+      },
+      "JobTracker.Application/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v10.0",
+        "dependencies": {
+          "JobTracker.Domain": "1.0.0"
+        },
+        "compile": {
+          "bin/placeholder/JobTracker.Application.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/JobTracker.Application.dll": {}
+        }
+      },
+      "JobTracker.Domain/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v10.0",
+        "compile": {
+          "bin/placeholder/JobTracker.Domain.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/JobTracker.Domain.dll": {}
+        }
+      },
+      "JobTracker.Infrastructure/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v10.0",
+        "dependencies": {
+          "JobTracker.Application": "1.0.0",
+          "JobTracker.Domain": "1.0.0"
+        },
+        "compile": {
+          "bin/placeholder/JobTracker.Infrastructure.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/JobTracker.Infrastructure.dll": {}
+        }
       }
     }
   },
@@ -75,10 +112,27 @@
         "microsoft.openapi.2.0.0.nupkg.sha512",
         "microsoft.openapi.nuspec"
       ]
+    },
+    "JobTracker.Application/1.0.0": {
+      "type": "project",
+      "path": "../JobTracker.Application/JobTracker.Application.csproj",
+      "msbuildProject": "../JobTracker.Application/JobTracker.Application.csproj"
+    },
+    "JobTracker.Domain/1.0.0": {
+      "type": "project",
+      "path": "../JobTracker.Domain/JobTracker.Domain.csproj",
+      "msbuildProject": "../JobTracker.Domain/JobTracker.Domain.csproj"
+    },
+    "JobTracker.Infrastructure/1.0.0": {
+      "type": "project",
+      "path": "../JobTracker.Infrastructure/JobTracker.Infrastructure.csproj",
+      "msbuildProject": "../JobTracker.Infrastructure/JobTracker.Infrastructure.csproj"
     }
   },
   "projectFileDependencyGroups": {
     "net10.0": [
+      "JobTracker.Application >= 1.0.0",
+      "JobTracker.Infrastructure >= 1.0.0",
       "Microsoft.AspNetCore.OpenApi >= 10.0.9"
     ]
   },
@@ -107,7 +161,14 @@
         "net10.0": {
           "framework": "net10.0",
           "targetAlias": "net10.0",
-          "projectReferences": {}
+          "projectReferences": {
+            "C:\\dotnet\\JobTracker\\src\\JobTracker.Application\\JobTracker.Application.csproj": {
+              "projectPath": "C:\\dotnet\\JobTracker\\src\\JobTracker.Application\\JobTracker.Application.csproj"
+            },
+            "C:\\dotnet\\JobTracker\\src\\JobTracker.Infrastructure\\JobTracker.Infrastructure.csproj": {
+              "projectPath": "C:\\dotnet\\JobTracker\\src\\JobTracker.Infrastructure\\JobTracker.Infrastructure.csproj"
+            }
+          }
         }
       },
       "warningProperties": {
