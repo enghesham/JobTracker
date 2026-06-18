@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using JobTracker.Application.Common.Exceptions;
 
 namespace JobTracker.Api.Middleware;
 
@@ -12,13 +13,28 @@ public sealed class ExceptionHandlingMiddleware(RequestDelegate next, ILogger<Ex
         }
         catch (Exception exception)
         {
-            logger.LogError(exception, "Unhandled request exception.");
+            if (exception is not AppValidationException)
+            {
+                logger.LogError(exception, "Unhandled request exception.");
+            }
+
             await WriteErrorResponse(context, exception);
         }
     }
 
     private static Task WriteErrorResponse(HttpContext context, Exception exception)
     {
+        if (exception is AppValidationException validationException)
+        {
+            context.Response.StatusCode = StatusCodes.Status400BadRequest;
+            return context.Response.WriteAsJsonAsync(new
+            {
+                title = "Validation failed.",
+                status = StatusCodes.Status400BadRequest,
+                errors = validationException.Errors
+            });
+        }
+
         var (statusCode, message) = exception switch
         {
             UnauthorizedAccessException => (HttpStatusCode.Unauthorized, exception.Message),
@@ -31,3 +47,4 @@ public sealed class ExceptionHandlingMiddleware(RequestDelegate next, ILogger<Ex
         return context.Response.WriteAsJsonAsync(new { error = message });
     }
 }
+

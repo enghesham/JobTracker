@@ -39,7 +39,7 @@ public sealed class JobApplicationConfiguration : IEntityTypeConfiguration<JobAp
         builder.HasOne(application => application.Company)
             .WithMany(company => company.JobApplications)
             .HasForeignKey(application => application.CompanyId)
-            .OnDelete(DeleteBehavior.SetNull);
+            .OnDelete(DeleteBehavior.Restrict);
 
         builder.HasMany(application => application.FollowUpReminders)
             .WithOne(reminder => reminder.JobApplication)
@@ -47,3 +47,4 @@ public sealed class JobApplicationConfiguration : IEntityTypeConfiguration<JobAp
             .OnDelete(DeleteBehavior.Cascade);
     }
 }
+

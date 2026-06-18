@@ -4,10 +4,24 @@ namespace JobTracker.Domain.Entities;
 
 public sealed class FollowUpReminder : BaseEntity
 {
-    public Guid JobApplicationId { get; set; }
-    public JobApplication? JobApplication { get; set; }
+    private FollowUpReminder() { }
 
-    public DateTime RemindAtUtc { get; set; }
-    public bool IsSent { get; set; }
-    public string? Message { get; set; }
+    public FollowUpReminder(Guid jobApplicationId, DateTime remindAtUtc, string? message)
+    {
+        JobApplicationId = jobApplicationId;
+        RemindAtUtc = remindAtUtc;
+        Message = message;
+    }
+
+    public Guid JobApplicationId { get; private set; }
+    public JobApplication? JobApplication { get; private set; }
+    public DateTime RemindAtUtc { get; private set; }
+    public bool IsSent { get; private set; }
+    public string? Message { get; private set; }
+
+    public void MarkAsSent()
+    {
+        IsSent = true;
+        MarkAsUpdated();
+    }
 }

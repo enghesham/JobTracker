@@ -1,4 +1,5 @@
 ﻿using JobTracker.Domain.Entities;
+// using Microsoft.EntityFrameworkCore;
 
 namespace JobTracker.Application.Common.Interfaces;
 

@@ -20,12 +20,10 @@ public sealed class UpdateJobApplicationStatusCommandHandler(
             .FirstOrDefault(application => application.Id == request.JobApplicationId && application.UserId == userId)
             ?? throw new InvalidOperationException("Job application was not found.");
 
-        jobApplication.Status = request.Status;
+        jobApplication.ChangeStatus(request.Status);
         await dbContext.SaveChangesAsync(cancellationToken);
 
-        var company = jobApplication.CompanyId.HasValue
-            ? dbContext.Companies.FirstOrDefault(candidate => candidate.Id == jobApplication.CompanyId.Value)
-            : null;
+        var company = dbContext.Companies.FirstOrDefault(candidate => candidate.Id == jobApplication.CompanyId);
 
         return new JobApplicationDto(
             jobApplication.Id,

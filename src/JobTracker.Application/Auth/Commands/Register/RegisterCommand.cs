@@ -21,12 +21,11 @@ public sealed class RegisterCommandHandler(
             throw new InvalidOperationException("Email is already registered.");
         }
 
-        var user = new User
-        {
-            FullName = request.FullName.Trim(),
-            Email = email,
-            PasswordHash = passwordHasher.Hash(request.Password)
-        };
+        var user = new User(
+            request.FullName.Trim(),
+            email,
+            passwordHasher.Hash(request.Password)
+        );
 
         dbContext.Add(user);
         await dbContext.SaveChangesAsync(cancellationToken);

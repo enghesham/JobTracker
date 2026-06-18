@@ -12,12 +12,10 @@ public sealed class CreateCompanyCommandHandler(IApplicationDbContext dbContext)
 {
     public async Task<CompanyDto> Handle(CreateCompanyCommand request, CancellationToken cancellationToken)
     {
-        var company = new Company
-        {
-            Name = request.Name.Trim(),
-            Website = string.IsNullOrWhiteSpace(request.Website) ? null : request.Website.Trim(),
-            Location = string.IsNullOrWhiteSpace(request.Location) ? null : request.Location.Trim()
-        };
+        var company = new Company(
+            request.Name.Trim(),
+            string.IsNullOrWhiteSpace(request.Website) ? null : request.Website.Trim(),
+            string.IsNullOrWhiteSpace(request.Location) ? null : request.Location.Trim());
 
         dbContext.Add(company);
         await dbContext.SaveChangesAsync(cancellationToken);
