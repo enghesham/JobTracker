@@ -12,11 +12,24 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
-        var connectionString = configuration.GetConnectionString("DefaultConnection")
-            ?? throw new InvalidOperationException("ConnectionStrings:DefaultConnection is not configured.");
+        // var connectionString = configuration.GetConnectionString("DefaultConnection")
+        //     ?? throw new InvalidOperationException("ConnectionStrings:DefaultConnection is not configured.");
+        var provider = configuration["Database:Provider"];
 
-        services.AddDbContext<ApplicationDbContext>(options =>
-            options.UseNpgsql(connectionString));
+        if (provider == "PostgreSql")
+        {
+            services.AddDbContext<ApplicationDbContext>(options =>
+                options.UseNpgsql(configuration.GetConnectionString("PostgreSql")));
+        }
+        else if (provider == "SqlServer")
+        {
+            services.AddDbContext<ApplicationDbContext>(options =>
+                options.UseSqlServer(configuration.GetConnectionString("SqlServer")));
+        }
+        else
+        {
+            throw new InvalidOperationException("Unsupported database provider.");
+        }
 
         services.AddScoped<IApplicationDbContext>(provider =>
             provider.GetRequiredService<ApplicationDbContext>());
@@ -26,5 +39,6 @@ public static class DependencyInjection
         services.AddHostedService<FollowUpReminderWorker>();
 
         return services;
-    }
+
+        }
 }
