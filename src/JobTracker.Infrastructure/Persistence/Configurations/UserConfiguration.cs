@@ -1,4 +1,4 @@
-﻿using JobTracker.Domain.Entities;
+﻿using JobTracker.Domain.Users;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

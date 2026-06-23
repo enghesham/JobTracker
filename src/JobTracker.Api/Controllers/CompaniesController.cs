@@ -1,6 +1,6 @@
-﻿using JobTracker.Application.Companies;
-using JobTracker.Application.Companies.Commands.CreateCompany;
-using JobTracker.Application.Companies.Queries.GetCompanies;
+﻿using JobTracker.Application.Features.Companies.Common;
+using JobTracker.Application.Features.Companies.Create;
+using JobTracker.Application.Features.Companies.GetAll;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

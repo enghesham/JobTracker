@@ -1,6 +1,6 @@
-﻿using JobTracker.Application.Auth.Commands;
-using JobTracker.Application.Auth.Commands.Login;
-using JobTracker.Application.Auth.Commands.Register;
+﻿using JobTracker.Application.Features.Auth;
+using JobTracker.Application.Features.Auth.Login;
+using JobTracker.Application.Features.Auth.Register;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 

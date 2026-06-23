@@ -1,5 +1,7 @@
-﻿using JobTracker.Domain.Entities;
-// using Microsoft.EntityFrameworkCore;
+﻿using JobTracker.Domain.Companies;
+using JobTracker.Domain.FollowUpReminders;
+using JobTracker.Domain.JobApplications;
+using JobTracker.Domain.Users;
 
 namespace JobTracker.Application.Common.Interfaces;
 

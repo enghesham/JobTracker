@@ -151,3 +151,4 @@ namespace JobTracker.Infrastructure.Persistence.Migrations
         }
     }
 }
+

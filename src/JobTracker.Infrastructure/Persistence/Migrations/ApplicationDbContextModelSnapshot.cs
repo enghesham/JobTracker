@@ -22,7 +22,7 @@ namespace JobTracker.Infrastructure.Persistence.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("JobTracker.Domain.Entities.Company", b =>
+            modelBuilder.Entity("JobTracker.Domain.Companies.Company", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -57,7 +57,7 @@ namespace JobTracker.Infrastructure.Persistence.Migrations
                     b.ToTable("Companies", (string)null);
                 });
 
-            modelBuilder.Entity("JobTracker.Domain.Entities.FollowUpReminder", b =>
+            modelBuilder.Entity("JobTracker.Domain.FollowUpReminders.FollowUpReminder", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -88,7 +88,7 @@ namespace JobTracker.Infrastructure.Persistence.Migrations
                     b.ToTable("FollowUpReminders");
                 });
 
-            modelBuilder.Entity("JobTracker.Domain.Entities.JobApplication", b =>
+            modelBuilder.Entity("JobTracker.Domain.JobApplications.JobApplication", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -147,7 +147,7 @@ namespace JobTracker.Infrastructure.Persistence.Migrations
                     b.ToTable("JobApplications", (string)null);
                 });
 
-            modelBuilder.Entity("JobTracker.Domain.Entities.User", b =>
+            modelBuilder.Entity("JobTracker.Domain.Users.User", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -182,16 +182,16 @@ namespace JobTracker.Infrastructure.Persistence.Migrations
                     b.ToTable("Users", (string)null);
                 });
 
-            modelBuilder.Entity("JobTracker.Domain.Entities.Company", b =>
+            modelBuilder.Entity("JobTracker.Domain.Companies.Company", b =>
                 {
-                    b.HasOne("JobTracker.Domain.Entities.User", null)
+                    b.HasOne("JobTracker.Domain.Users.User", null)
                         .WithMany("Companies")
                         .HasForeignKey("UserId");
                 });
 
-            modelBuilder.Entity("JobTracker.Domain.Entities.FollowUpReminder", b =>
+            modelBuilder.Entity("JobTracker.Domain.FollowUpReminders.FollowUpReminder", b =>
                 {
-                    b.HasOne("JobTracker.Domain.Entities.JobApplication", "JobApplication")
+                    b.HasOne("JobTracker.Domain.JobApplications.JobApplication", "JobApplication")
                         .WithMany("FollowUpReminders")
                         .HasForeignKey("JobApplicationId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -200,15 +200,15 @@ namespace JobTracker.Infrastructure.Persistence.Migrations
                     b.Navigation("JobApplication");
                 });
 
-            modelBuilder.Entity("JobTracker.Domain.Entities.JobApplication", b =>
+            modelBuilder.Entity("JobTracker.Domain.JobApplications.JobApplication", b =>
                 {
-                    b.HasOne("JobTracker.Domain.Entities.Company", "Company")
+                    b.HasOne("JobTracker.Domain.Companies.Company", "Company")
                         .WithMany("JobApplications")
                         .HasForeignKey("CompanyId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("JobTracker.Domain.Entities.User", "User")
+                    b.HasOne("JobTracker.Domain.Users.User", "User")
                         .WithMany("JobApplications")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -219,17 +219,17 @@ namespace JobTracker.Infrastructure.Persistence.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("JobTracker.Domain.Entities.Company", b =>
+            modelBuilder.Entity("JobTracker.Domain.Companies.Company", b =>
                 {
                     b.Navigation("JobApplications");
                 });
 
-            modelBuilder.Entity("JobTracker.Domain.Entities.JobApplication", b =>
+            modelBuilder.Entity("JobTracker.Domain.JobApplications.JobApplication", b =>
                 {
                     b.Navigation("FollowUpReminders");
                 });
 
-            modelBuilder.Entity("JobTracker.Domain.Entities.User", b =>
+            modelBuilder.Entity("JobTracker.Domain.Users.User", b =>
                 {
                     b.Navigation("Companies");
 
@@ -239,3 +239,4 @@ namespace JobTracker.Infrastructure.Persistence.Migrations
         }
     }
 }
+

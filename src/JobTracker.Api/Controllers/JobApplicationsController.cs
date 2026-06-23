@@ -1,7 +1,7 @@
-﻿using JobTracker.Application.JobApplications;
-using JobTracker.Application.JobApplications.Commands.CreateJobApplication;
-using JobTracker.Application.JobApplications.Commands.UpdateJobApplicationStatus;
-using JobTracker.Application.JobApplications.Queries.GetMyJobApplications;
+﻿using JobTracker.Application.Features.JobApplications.Common;
+using JobTracker.Application.Features.JobApplications.Create;
+using JobTracker.Application.Features.JobApplications.GetMine;
+using JobTracker.Application.Features.JobApplications.UpdateStatus;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

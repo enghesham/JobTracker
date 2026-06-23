@@ -1,7 +1,10 @@
 ﻿using JobTracker.Application.Common.Interfaces;
-using JobTracker.Infrastructure.Auth;
+using JobTracker.Application.Features.Companies.Common;
+using JobTracker.Application.Features.JobApplications.Common;
+using JobTracker.Infrastructure.Authentication;
 using JobTracker.Infrastructure.BackgroundJobs;
 using JobTracker.Infrastructure.Persistence;
+using JobTracker.Infrastructure.Persistence.ReadServices;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -12,8 +15,6 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
-        // var connectionString = configuration.GetConnectionString("DefaultConnection")
-        //     ?? throw new InvalidOperationException("ConnectionStrings:DefaultConnection is not configured.");
         var provider = configuration["Database:Provider"];
 
         if (provider == "PostgreSql")
@@ -34,11 +35,12 @@ public static class DependencyInjection
         services.AddScoped<IApplicationDbContext>(provider =>
             provider.GetRequiredService<ApplicationDbContext>());
 
+        services.AddScoped<ICompanyReadService, CompanyReadService>();
+        services.AddScoped<IJobApplicationReadService, JobApplicationReadService>();
         services.AddScoped<IJwtTokenService, JwtTokenService>();
         services.AddScoped<IPasswordHasher, PasswordHasher>();
         services.AddHostedService<FollowUpReminderWorker>();
 
         return services;
-
-        }
+    }
 }

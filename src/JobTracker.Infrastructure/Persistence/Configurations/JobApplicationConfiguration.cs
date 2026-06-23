@@ -1,4 +1,4 @@
-﻿using JobTracker.Domain.Entities;
+﻿using JobTracker.Domain.JobApplications;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -47,4 +47,3 @@ public sealed class JobApplicationConfiguration : IEntityTypeConfiguration<JobAp
             .OnDelete(DeleteBehavior.Cascade);
     }
 }
-
