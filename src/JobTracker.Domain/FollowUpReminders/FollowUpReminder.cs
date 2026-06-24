@@ -1,4 +1,4 @@
-﻿using JobTracker.Domain.Common;
+using JobTracker.Domain.Common;
 using JobTracker.Domain.JobApplications;
 
 namespace JobTracker.Domain.FollowUpReminders;
@@ -9,9 +9,11 @@ public sealed class FollowUpReminder : BaseEntity
 
     private FollowUpReminder() { }
 
-    public FollowUpReminder(Guid jobApplicationId, DateTime remindAtUtc, string? message)
+    public FollowUpReminder(Guid jobApplicationId, DateTimeOffset remindAtUtc, string? message)
     {
         DomainGuard.AgainstEmpty(jobApplicationId, nameof(jobApplicationId));
+
+        remindAtUtc = remindAtUtc.ToUniversalTime();
 
         if (remindAtUtc == default)
         {
@@ -25,11 +27,11 @@ public sealed class FollowUpReminder : BaseEntity
 
     public Guid JobApplicationId { get; private set; }
     public JobApplication? JobApplication { get; private set; }
-    public DateTime RemindAtUtc { get; private set; }
+    public DateTimeOffset RemindAtUtc { get; private set; }
     public bool IsSent { get; private set; }
     public string? Message { get; private set; }
 
-    public void MarkAsSent()
+    public void MarkAsSent(DateTimeOffset nowUtc)
     {
         if (IsSent)
         {
@@ -37,6 +39,6 @@ public sealed class FollowUpReminder : BaseEntity
         }
 
         IsSent = true;
-        MarkAsUpdated();
+        MarkAsUpdated(nowUtc);
     }
 }

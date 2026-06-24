@@ -1,4 +1,4 @@
-﻿using JobTracker.Domain.JobApplications;
+using JobTracker.Domain.JobApplications;
 
 namespace JobTracker.Application.Features.JobApplications.Common;
 
@@ -10,6 +10,6 @@ public sealed record JobApplicationDto(
     string? Location,
     string? SourceUrl,
     JobApplicationStatus Status,
-    DateTime AppliedAtUtc,
-    DateTime? FollowUpOnUtc,
+    DateTimeOffset AppliedAtUtc,
+    DateTimeOffset? FollowUpOnUtc,
     string? Notes);

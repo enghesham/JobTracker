@@ -1,18 +1,18 @@
-﻿namespace JobTracker.Domain.Common;
+namespace JobTracker.Domain.Common;
 
 public abstract class BaseEntity
 {
     public Guid Id { get; private set; } = Guid.NewGuid();
-    public DateTime CreatedAtUtc { get; private set; } = DateTime.UtcNow;
-    public DateTime? UpdatedAtUtc { get; private set; }
+    public DateTimeOffset CreatedAtUtc { get; private set; }
+    public DateTimeOffset? UpdatedAtUtc { get; private set; }
 
-    public void MarkAsCreated(DateTime createdAtUtc)
+    public void MarkAsCreated(DateTimeOffset createdAtUtc)
     {
-        CreatedAtUtc = createdAtUtc;
+        CreatedAtUtc = createdAtUtc.ToUniversalTime();
     }
 
-    public void MarkAsUpdated(DateTime? updatedAtUtc = null)
+    public void MarkAsUpdated(DateTimeOffset updatedAtUtc)
     {
-        UpdatedAtUtc = updatedAtUtc ?? DateTime.UtcNow;
+        UpdatedAtUtc = updatedAtUtc.ToUniversalTime();
     }
 }

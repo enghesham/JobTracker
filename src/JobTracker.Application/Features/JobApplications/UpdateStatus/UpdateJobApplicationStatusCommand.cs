@@ -1,4 +1,4 @@
-﻿using JobTracker.Application.Common.Interfaces;
+using JobTracker.Application.Common.Interfaces;
 using JobTracker.Application.Common.Results;
 using JobTracker.Application.Features.JobApplications.Common;
 using JobTracker.Domain.JobApplications;
@@ -14,7 +14,8 @@ public sealed class UpdateJobApplicationStatusCommandHandler(
     ICompanyStore companyStore,
     IJobApplicationStore jobApplicationStore,
     IUnitOfWork unitOfWork,
-    ICurrentUserService currentUserService) : IRequestHandler<UpdateJobApplicationStatusCommand, Result<JobApplicationDto>>
+    ICurrentUserService currentUserService,
+    TimeProvider timeProvider) : IRequestHandler<UpdateJobApplicationStatusCommand, Result<JobApplicationDto>>
 {
     public async Task<Result<JobApplicationDto>> Handle(UpdateJobApplicationStatusCommand request, CancellationToken cancellationToken)
     {
@@ -36,7 +37,7 @@ public sealed class UpdateJobApplicationStatusCommandHandler(
                 "The requested job application does not exist."));
         }
 
-        jobApplication.ChangeStatus(request.Status);
+        jobApplication.ChangeStatus(request.Status, timeProvider.GetUtcNow());
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
         var company = await companyStore.GetForUserAsync(jobApplication.CompanyId, userId.Value, cancellationToken);

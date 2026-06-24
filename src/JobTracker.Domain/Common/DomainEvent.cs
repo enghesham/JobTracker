@@ -1,8 +1,3 @@
-﻿namespace JobTracker.Domain.Common;
+namespace JobTracker.Domain.Common;
 
-public abstract record DomainEvent(DateTime OccurredAtUtc)
-{
-    protected DomainEvent() : this(DateTime.UtcNow)
-    {
-    }
-}
+public abstract record DomainEvent(DateTimeOffset OccurredAtUtc);

@@ -1,4 +1,4 @@
-﻿using JobTracker.Infrastructure.Persistence;
+using JobTracker.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -8,6 +8,7 @@ namespace JobTracker.Infrastructure.BackgroundJobs;
 
 public sealed class FollowUpReminderWorker(
     IServiceScopeFactory scopeFactory,
+    TimeProvider timeProvider,
     ILogger<FollowUpReminderWorker> logger) : BackgroundService
 {
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -24,15 +25,15 @@ public sealed class FollowUpReminderWorker(
     {
         using var scope = scopeFactory.CreateScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-        var now = DateTime.UtcNow;
+        var nowUtc = timeProvider.GetUtcNow();
 
         var dueReminders = await dbContext.FollowUpReminders
-            .Where(reminder => !reminder.IsSent && reminder.RemindAtUtc <= now)
+            .Where(reminder => !reminder.IsSent && reminder.RemindAtUtc <= nowUtc)
             .ToArrayAsync(cancellationToken);
 
         foreach (var reminder in dueReminders)
         {
-            reminder.MarkAsSent();
+            reminder.MarkAsSent(nowUtc);
             logger.LogInformation("Follow-up reminder {ReminderId} marked as sent.", reminder.Id);
         }
 

@@ -1,4 +1,4 @@
-﻿using JobTracker.Application.Common.Interfaces;
+using JobTracker.Application.Common.Interfaces;
 using JobTracker.Application.Common.Results;
 using JobTracker.Application.Features.JobApplications.Common;
 using JobTracker.Domain.JobApplications;
@@ -12,14 +12,15 @@ public sealed record CreateJobApplicationCommand(
     string? JobDescription,
     string? Location,
     string? SourceUrl,
-    DateTime? FollowUpOnUtc,
+    DateTimeOffset? FollowUpOnUtc,
     string? Notes) : IRequest<Result<JobApplicationDto>>;
 
 public sealed class CreateJobApplicationCommandHandler(
     ICompanyStore companyStore,
     IJobApplicationStore jobApplicationStore,
     IUnitOfWork unitOfWork,
-    ICurrentUserService currentUserService) : IRequestHandler<CreateJobApplicationCommand, Result<JobApplicationDto>>
+    ICurrentUserService currentUserService,
+    TimeProvider timeProvider) : IRequestHandler<CreateJobApplicationCommand, Result<JobApplicationDto>>
 {
     public async Task<Result<JobApplicationDto>> Handle(CreateJobApplicationCommand request, CancellationToken cancellationToken)
     {
@@ -41,18 +42,22 @@ public sealed class CreateJobApplicationCommandHandler(
                 "The requested company does not exist for the current user."));
         }
 
+        var nowUtc = timeProvider.GetUtcNow();
+
         var jobApplication = new JobApplication(
             userId.Value,
             request.CompanyId,
             request.JobTitle,
             request.SourceUrl,
-            DateTime.UtcNow);
+            nowUtc,
+            nowUtc);
 
         jobApplication.UpdateDetails(
             request.JobDescription,
             request.Location,
             request.FollowUpOnUtc,
-            request.Notes);
+            request.Notes,
+            nowUtc);
 
         jobApplicationStore.Add(jobApplication);
         await unitOfWork.SaveChangesAsync(cancellationToken);

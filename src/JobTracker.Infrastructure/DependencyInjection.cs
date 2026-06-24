@@ -1,4 +1,4 @@
-﻿using JobTracker.Application.Common.Interfaces;
+using JobTracker.Application.Common.Interfaces;
 using JobTracker.Application.Features.Companies.Common;
 using JobTracker.Application.Features.JobApplications.Common;
 using JobTracker.Infrastructure.Authentication;
@@ -9,6 +9,7 @@ using JobTracker.Infrastructure.Persistence.Stores;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace JobTracker.Infrastructure;
 
@@ -16,6 +17,8 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
+        services.TryAddSingleton(TimeProvider.System);
+
         var provider = configuration["Database:Provider"];
 
         if (provider == "PostgreSql")
@@ -55,4 +58,3 @@ public static class DependencyInjection
                 $"ConnectionStrings:{name} is not configured. Use User Secrets for local development or an environment variable such as ConnectionStrings__{name}.");
     }
 }
-

@@ -1,16 +1,17 @@
-﻿using JobTracker.Application.Common.Interfaces;
+using System.Reflection;
+using JobTracker.Application.Common.Interfaces;
 using JobTracker.Domain.Common;
 using JobTracker.Domain.Companies;
 using JobTracker.Domain.FollowUpReminders;
 using JobTracker.Domain.JobApplications;
 using JobTracker.Domain.Users;
 using Microsoft.EntityFrameworkCore;
-using System.Reflection;
 
 namespace JobTracker.Infrastructure.Persistence;
 
-public sealed class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
-    : DbContext(options), IUnitOfWork
+public sealed class ApplicationDbContext(
+    DbContextOptions<ApplicationDbContext> options,
+    TimeProvider timeProvider) : DbContext(options), IUnitOfWork
 {
     public DbSet<User> Users => Set<User>();
     public DbSet<Company> Companies => Set<Company>();
@@ -25,18 +26,18 @@ public sealed class ApplicationDbContext(DbContextOptions<ApplicationDbContext> 
 
     public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
-        var now = DateTime.UtcNow;
+        var nowUtc = timeProvider.GetUtcNow();
 
         foreach (var entry in ChangeTracker.Entries<BaseEntity>())
         {
             if (entry.State == EntityState.Added)
             {
-                entry.Entity.MarkAsCreated(now);
+                entry.Entity.MarkAsCreated(nowUtc);
             }
 
             if (entry.State == EntityState.Modified)
             {
-                entry.Entity.MarkAsUpdated(now);
+                entry.Entity.MarkAsUpdated(nowUtc);
             }
         }
 

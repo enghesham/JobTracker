@@ -1,4 +1,4 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
 using System.Text;
 using JobTracker.Application.Common.Interfaces;
 using JobTracker.Domain.Users;
@@ -8,7 +8,7 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace JobTracker.Infrastructure.Authentication;
 
-public sealed class JwtTokenService(IConfiguration configuration) : IJwtTokenService
+public sealed class JwtTokenService(IConfiguration configuration, TimeProvider timeProvider) : IJwtTokenService
 {
     public string CreateToken(User user)
     {
@@ -31,7 +31,7 @@ public sealed class JwtTokenService(IConfiguration configuration) : IJwtTokenSer
         var descriptor = new SecurityTokenDescriptor
         {
             Subject = new ClaimsIdentity(claims),
-            Expires = DateTime.UtcNow.AddMinutes(expiryMinutes),
+            Expires = timeProvider.GetUtcNow().AddMinutes(expiryMinutes).UtcDateTime,
             Issuer = issuer,
             Audience = audience,
             SigningCredentials = new SigningCredentials(

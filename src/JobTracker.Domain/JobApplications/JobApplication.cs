@@ -1,4 +1,4 @@
-﻿using JobTracker.Domain.Common;
+using JobTracker.Domain.Common;
 using JobTracker.Domain.Companies;
 using JobTracker.Domain.FollowUpReminders;
 using JobTracker.Domain.Users;
@@ -34,17 +34,21 @@ public sealed class JobApplication : BaseEntity
         Guid companyId,
         string jobTitle,
         string? sourceUrl,
-        DateTime appliedAtUtc)
+        DateTimeOffset appliedAtUtc,
+        DateTimeOffset nowUtc)
     {
         DomainGuard.AgainstEmpty(userId, nameof(userId));
         DomainGuard.AgainstEmpty(companyId, nameof(companyId));
+
+        appliedAtUtc = appliedAtUtc.ToUniversalTime();
+        nowUtc = nowUtc.ToUniversalTime();
 
         if (appliedAtUtc == default)
         {
             throw new DomainException("Applied date is required.");
         }
 
-        if (appliedAtUtc > DateTime.UtcNow.AddMinutes(5))
+        if (appliedAtUtc > nowUtc.AddMinutes(5))
         {
             throw new DomainException("Applied date cannot be in the future.");
         }
@@ -64,17 +68,25 @@ public sealed class JobApplication : BaseEntity
     public string? Location { get; private set; }
     public string? SourceUrl { get; private set; }
     public JobApplicationStatus Status { get; private set; } = JobApplicationStatus.Applied;
-    public DateTime? FollowUpOnUtc { get; private set; }
-    public DateTime AppliedAtUtc { get; private set; } = DateTime.UtcNow;
+    public DateTimeOffset? FollowUpOnUtc { get; private set; }
+    public DateTimeOffset AppliedAtUtc { get; private set; }
     public string? Notes { get; private set; }
 
     public User User { get; private set; } = default!;
     public Company Company { get; private set; } = default!;
     public IReadOnlyCollection<FollowUpReminder> FollowUpReminders => _followUpReminders;
 
-    public void UpdateDetails(string? jobDescription, string? location, DateTime? followUpOnUtc, string? notes)
+    public void UpdateDetails(
+        string? jobDescription,
+        string? location,
+        DateTimeOffset? followUpOnUtc,
+        string? notes,
+        DateTimeOffset nowUtc)
     {
-        if (followUpOnUtc.HasValue && followUpOnUtc.Value.Date < DateTime.UtcNow.Date)
+        nowUtc = nowUtc.ToUniversalTime();
+        followUpOnUtc = followUpOnUtc?.ToUniversalTime();
+
+        if (followUpOnUtc.HasValue && followUpOnUtc.Value.UtcDateTime.Date < nowUtc.UtcDateTime.Date)
         {
             throw new DomainException("Follow-up date cannot be in the past.");
         }
@@ -83,10 +95,10 @@ public sealed class JobApplication : BaseEntity
         Location = DomainGuard.Optional(location, nameof(location), LocationMaxLength);
         FollowUpOnUtc = followUpOnUtc;
         Notes = DomainGuard.Optional(notes, nameof(notes), NotesMaxLength);
-        MarkAsUpdated();
+        MarkAsUpdated(nowUtc);
     }
 
-    public void ChangeStatus(JobApplicationStatus status)
+    public void ChangeStatus(JobApplicationStatus status, DateTimeOffset nowUtc)
     {
         if (status == Status)
         {
@@ -99,12 +111,12 @@ public sealed class JobApplication : BaseEntity
         }
 
         Status = status;
-        MarkAsUpdated();
+        MarkAsUpdated(nowUtc);
     }
 
-    public void UpdateNotes(string? notes)
+    public void UpdateNotes(string? notes, DateTimeOffset nowUtc)
     {
         Notes = DomainGuard.Optional(notes, nameof(notes), NotesMaxLength);
-        MarkAsUpdated();
+        MarkAsUpdated(nowUtc);
     }
 }
