@@ -4,6 +4,7 @@ using JobTracker.Application.Features.JobApplications.Common;
 using JobTracker.Infrastructure.Authentication;
 using JobTracker.Infrastructure.BackgroundJobs;
 using JobTracker.Infrastructure.Persistence;
+using JobTracker.Infrastructure.Persistence.Interceptors;
 using JobTracker.Infrastructure.Persistence.ReadServices;
 using JobTracker.Infrastructure.Persistence.Stores;
 using Microsoft.EntityFrameworkCore;
@@ -18,18 +19,23 @@ public static class DependencyInjection
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
         services.TryAddSingleton(TimeProvider.System);
+        services.AddSingleton<AuditingSaveChangesInterceptor>();
 
         var provider = configuration["Database:Provider"];
 
         if (provider == "PostgreSql")
         {
-            services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseNpgsql(GetRequiredConnectionString(configuration, "PostgreSql")));
+            services.AddDbContext<ApplicationDbContext>((serviceProvider, options) =>
+                options
+                    .UseNpgsql(GetRequiredConnectionString(configuration, "PostgreSql"))
+                    .AddInterceptors(serviceProvider.GetRequiredService<AuditingSaveChangesInterceptor>()));
         }
         else if (provider == "SqlServer")
         {
-            services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(GetRequiredConnectionString(configuration, "SqlServer")));
+            services.AddDbContext<ApplicationDbContext>((serviceProvider, options) =>
+                options
+                    .UseSqlServer(GetRequiredConnectionString(configuration, "SqlServer"))
+                    .AddInterceptors(serviceProvider.GetRequiredService<AuditingSaveChangesInterceptor>()));
         }
         else
         {

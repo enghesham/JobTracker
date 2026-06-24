@@ -14,8 +14,7 @@ public sealed class UpdateJobApplicationStatusCommandHandler(
     ICompanyStore companyStore,
     IJobApplicationStore jobApplicationStore,
     IUnitOfWork unitOfWork,
-    ICurrentUserService currentUserService,
-    TimeProvider timeProvider) : IRequestHandler<UpdateJobApplicationStatusCommand, Result<JobApplicationDto>>
+    ICurrentUserService currentUserService) : IRequestHandler<UpdateJobApplicationStatusCommand, Result<JobApplicationDto>>
 {
     public async Task<Result<JobApplicationDto>> Handle(UpdateJobApplicationStatusCommand request, CancellationToken cancellationToken)
     {
@@ -37,7 +36,7 @@ public sealed class UpdateJobApplicationStatusCommandHandler(
                 "The requested job application does not exist."));
         }
 
-        jobApplication.ChangeStatus(request.Status, timeProvider.GetUtcNow());
+        jobApplication.ChangeStatus(request.Status);
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
         var company = await companyStore.GetForUserAsync(jobApplication.CompanyId, userId.Value, cancellationToken);

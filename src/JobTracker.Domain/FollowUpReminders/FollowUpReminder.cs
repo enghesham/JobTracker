@@ -31,7 +31,7 @@ public sealed class FollowUpReminder : BaseEntity
     public bool IsSent { get; private set; }
     public string? Message { get; private set; }
 
-    public void MarkAsSent(DateTimeOffset nowUtc)
+    public void MarkAsSent()
     {
         if (IsSent)
         {
@@ -39,6 +39,5 @@ public sealed class FollowUpReminder : BaseEntity
         }
 
         IsSent = true;
-        MarkAsUpdated(nowUtc);
     }
 }

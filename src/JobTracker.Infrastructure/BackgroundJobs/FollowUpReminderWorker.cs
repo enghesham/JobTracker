@@ -33,7 +33,7 @@ public sealed class FollowUpReminderWorker(
 
         foreach (var reminder in dueReminders)
         {
-            reminder.MarkAsSent(nowUtc);
+            reminder.MarkAsSent();
             logger.LogInformation("Follow-up reminder {ReminderId} marked as sent.", reminder.Id);
         }
 

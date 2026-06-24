@@ -1,6 +1,7 @@
 using FluentAssertions;
 using JobTracker.Domain.Users;
 using JobTracker.Infrastructure.Persistence;
+using JobTracker.Infrastructure.Persistence.Interceptors;
 using Microsoft.EntityFrameworkCore;
 
 namespace JobTracker.Tests;
@@ -14,9 +15,10 @@ public sealed class TimeProviderTests
         var timeProvider = new FixedTimeProvider(utcNow);
         var options = new DbContextOptionsBuilder<ApplicationDbContext>()
             .UseInMemoryDatabase(Guid.NewGuid().ToString())
+            .AddInterceptors(new AuditingSaveChangesInterceptor(timeProvider))
             .Options;
 
-        await using var dbContext = new ApplicationDbContext(options, timeProvider);
+        await using var dbContext = new ApplicationDbContext(options);
         var user = new User("Test User", "test@example.com", "hashed-password");
 
         dbContext.Users.Add(user);

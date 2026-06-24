@@ -95,10 +95,9 @@ public sealed class JobApplication : BaseEntity
         Location = DomainGuard.Optional(location, nameof(location), LocationMaxLength);
         FollowUpOnUtc = followUpOnUtc;
         Notes = DomainGuard.Optional(notes, nameof(notes), NotesMaxLength);
-        MarkAsUpdated(nowUtc);
     }
 
-    public void ChangeStatus(JobApplicationStatus status, DateTimeOffset nowUtc)
+    public void ChangeStatus(JobApplicationStatus status)
     {
         if (status == Status)
         {
@@ -111,12 +110,10 @@ public sealed class JobApplication : BaseEntity
         }
 
         Status = status;
-        MarkAsUpdated(nowUtc);
     }
 
-    public void UpdateNotes(string? notes, DateTimeOffset nowUtc)
+    public void UpdateNotes(string? notes)
     {
         Notes = DomainGuard.Optional(notes, nameof(notes), NotesMaxLength);
-        MarkAsUpdated(nowUtc);
     }
 }

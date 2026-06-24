@@ -6,12 +6,12 @@ public abstract class BaseEntity
     public DateTimeOffset CreatedAtUtc { get; private set; }
     public DateTimeOffset? UpdatedAtUtc { get; private set; }
 
-    public void MarkAsCreated(DateTimeOffset createdAtUtc)
+    internal void MarkAsCreated(DateTimeOffset createdAtUtc)
     {
         CreatedAtUtc = createdAtUtc.ToUniversalTime();
     }
 
-    public void MarkAsUpdated(DateTimeOffset updatedAtUtc)
+    internal void MarkAsUpdated(DateTimeOffset updatedAtUtc)
     {
         UpdatedAtUtc = updatedAtUtc.ToUniversalTime();
     }
