@@ -6,6 +6,12 @@ namespace JobTracker.Api.Middleware;
 
 public sealed class ExceptionHandlingMiddleware(RequestDelegate next, ILogger<ExceptionHandlingMiddleware> logger)
 {
+    private static readonly Action<ILogger, Exception?> UnhandledRequestException =
+        LoggerMessage.Define(
+            LogLevel.Error,
+            new EventId(4000, nameof(UnhandledRequestException)),
+            "Unhandled request exception.");
+
     public async Task InvokeAsync(HttpContext context)
     {
         try
@@ -16,7 +22,7 @@ public sealed class ExceptionHandlingMiddleware(RequestDelegate next, ILogger<Ex
         {
             if (exception is not AppValidationException and not DomainException)
             {
-                logger.LogError(exception, "Unhandled request exception.");
+                UnhandledRequestException(logger, exception);
             }
 
             await WriteErrorResponse(context, exception);

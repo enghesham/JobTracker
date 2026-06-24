@@ -7,9 +7,15 @@ namespace JobTracker.Infrastructure.Persistence.Interceptors;
 
 public sealed class DatabaseMetricsInterceptor(ILogger<DatabaseMetricsInterceptor> logger) : DbCommandInterceptor
 {
+    private static readonly Action<ILogger, string, double, Exception?> DatabaseCommandFailed =
+        LoggerMessage.Define<string, double>(
+            LogLevel.Error,
+            new EventId(3000, nameof(DatabaseCommandFailed)),
+            "Database command failed for provider {DatabaseProvider} after {ElapsedMilliseconds} ms.");
+
     public override void CommandFailed(DbCommand command, CommandErrorEventData eventData)
     {
-        RecordFailure(command, eventData);
+        RecordFailure(eventData);
         base.CommandFailed(command, eventData);
     }
 
@@ -18,11 +24,11 @@ public sealed class DatabaseMetricsInterceptor(ILogger<DatabaseMetricsIntercepto
         CommandErrorEventData eventData,
         CancellationToken cancellationToken = default)
     {
-        RecordFailure(command, eventData);
+        RecordFailure(eventData);
         return base.CommandFailedAsync(command, eventData, cancellationToken);
     }
 
-    private void RecordFailure(DbCommand command, CommandErrorEventData eventData)
+    private void RecordFailure(CommandErrorEventData eventData)
     {
         var provider = eventData.Context?.Database.ProviderName ?? "unknown";
 
@@ -30,10 +36,6 @@ public sealed class DatabaseMetricsInterceptor(ILogger<DatabaseMetricsIntercepto
             1,
             new KeyValuePair<string, object?>("provider", provider));
 
-        logger.LogError(
-            eventData.Exception,
-            "Database command failed for provider {DatabaseProvider} after {ElapsedMilliseconds} ms.",
-            provider,
-            eventData.Duration.TotalMilliseconds);
+        DatabaseCommandFailed(logger, provider, eventData.Duration.TotalMilliseconds, eventData.Exception);
     }
 }

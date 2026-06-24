@@ -6,6 +6,12 @@ public sealed class CorrelationIdMiddleware(RequestDelegate next, ILogger<Correl
 {
     public const string HeaderName = "X-Correlation-ID";
 
+    private static readonly Action<ILogger, string, string?, int, double, Exception?> HttpRequestCompleted =
+        LoggerMessage.Define<string, string?, int, double>(
+            LogLevel.Information,
+            new EventId(4001, nameof(HttpRequestCompleted)),
+            "HTTP {Method} {Path} responded {StatusCode} in {ElapsedMilliseconds} ms.");
+
     public async Task InvokeAsync(HttpContext context)
     {
         var correlationId = GetOrCreateCorrelationId(context);
@@ -37,12 +43,13 @@ public sealed class CorrelationIdMiddleware(RequestDelegate next, ILogger<Correl
         {
             stopwatch.Stop();
 
-            logger.LogInformation(
-                "HTTP {Method} {Path} responded {StatusCode} in {ElapsedMilliseconds} ms.",
+            HttpRequestCompleted(
+                logger,
                 context.Request.Method,
                 context.Request.Path.Value,
                 context.Response.StatusCode,
-                stopwatch.Elapsed.TotalMilliseconds);
+                stopwatch.Elapsed.TotalMilliseconds,
+                null);
         }
     }
 

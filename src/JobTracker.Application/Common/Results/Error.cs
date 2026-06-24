@@ -1,4 +1,4 @@
-﻿namespace JobTracker.Application.Common.Results;
+namespace JobTracker.Application.Common.Results;
 
 public sealed record Error(string Code, string Title, string Detail, ErrorType Type)
 {

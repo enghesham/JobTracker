@@ -1,4 +1,4 @@
-﻿using JobTracker.Domain.FollowUpReminders;
+using JobTracker.Domain.FollowUpReminders;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

@@ -1,4 +1,4 @@
-﻿using FluentValidation;
+using FluentValidation;
 using JobTracker.Application.Common.Exceptions;
 using MediatR;
 

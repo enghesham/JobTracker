@@ -9,7 +9,7 @@ namespace JobTracker.Tests;
 public sealed class TimeProviderTests
 {
     [Fact]
-    public async Task SaveChangesAsync_uses_configured_time_provider_for_created_timestamp()
+    public async Task SaveChangesAsyncUsesConfiguredTimeProviderForCreatedTimestamp()
     {
         var utcNow = new DateTimeOffset(2026, 6, 24, 10, 30, 0, TimeSpan.Zero);
         var timeProvider = new FixedTimeProvider(utcNow);
@@ -32,3 +32,4 @@ public sealed class TimeProviderTests
         public override DateTimeOffset GetUtcNow() => utcNow;
     }
 }
+

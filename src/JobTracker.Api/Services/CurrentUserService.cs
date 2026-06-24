@@ -1,4 +1,4 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
 using JobTracker.Application.Common.Interfaces;
 
 namespace JobTracker.Api.Services;

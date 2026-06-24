@@ -1,4 +1,4 @@
-﻿namespace JobTracker.Domain.Common;
+namespace JobTracker.Domain.Common;
 
 public static class DomainGuard
 {

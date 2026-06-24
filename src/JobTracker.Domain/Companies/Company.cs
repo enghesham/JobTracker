@@ -1,4 +1,4 @@
-﻿using JobTracker.Domain.Common;
+using JobTracker.Domain.Common;
 using JobTracker.Domain.JobApplications;
 using JobTracker.Domain.Users;
 

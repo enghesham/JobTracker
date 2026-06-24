@@ -1,4 +1,4 @@
-﻿using JobTracker.Application.Features.JobApplications.Common;
+using JobTracker.Application.Features.JobApplications.Common;
 using JobTracker.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 

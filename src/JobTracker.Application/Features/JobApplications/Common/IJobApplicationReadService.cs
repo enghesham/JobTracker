@@ -1,4 +1,4 @@
-﻿namespace JobTracker.Application.Features.JobApplications.Common;
+namespace JobTracker.Application.Features.JobApplications.Common;
 
 public interface IJobApplicationReadService
 {

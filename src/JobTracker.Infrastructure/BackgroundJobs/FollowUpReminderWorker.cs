@@ -12,6 +12,24 @@ public sealed class FollowUpReminderWorker(
     TimeProvider timeProvider,
     ILogger<FollowUpReminderWorker> logger) : BackgroundService
 {
+    private static readonly Action<ILogger, Exception?> ReminderProcessingFailed =
+        LoggerMessage.Define(
+            LogLevel.Error,
+            new EventId(2000, nameof(ReminderProcessingFailed)),
+            "Follow-up reminder processing failed.");
+
+    private static readonly Action<ILogger, Guid, Exception?> ReminderMarkedAsSent =
+        LoggerMessage.Define<Guid>(
+            LogLevel.Information,
+            new EventId(2001, nameof(ReminderMarkedAsSent)),
+            "Follow-up reminder {ReminderId} marked as sent.");
+
+    private static readonly Action<ILogger, int, DateTimeOffset, Exception?> RemindersProcessed =
+        LoggerMessage.Define<int, DateTimeOffset>(
+            LogLevel.Information,
+            new EventId(2002, nameof(RemindersProcessed)),
+            "Processed {ReminderCount} follow-up reminders due before {NowUtc}.");
+
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         using var timer = new PeriodicTimer(TimeSpan.FromMinutes(5));
@@ -29,7 +47,7 @@ public sealed class FollowUpReminderWorker(
             catch (Exception exception)
             {
                 InfrastructureDiagnostics.ReminderFailureCount.Add(1);
-                logger.LogError(exception, "Follow-up reminder processing failed.");
+                ReminderProcessingFailed(logger, exception);
             }
         }
     }
@@ -47,7 +65,7 @@ public sealed class FollowUpReminderWorker(
         foreach (var reminder in dueReminders)
         {
             reminder.MarkAsSent();
-            logger.LogInformation("Follow-up reminder {ReminderId} marked as sent.", reminder.Id);
+            ReminderMarkedAsSent(logger, reminder.Id, null);
         }
 
         if (dueReminders.Length > 0)
@@ -57,10 +75,7 @@ public sealed class FollowUpReminderWorker(
                 dueReminders.Length,
                 new KeyValuePair<string, object?>("result", "sent"));
 
-            logger.LogInformation(
-                "Processed {ReminderCount} follow-up reminders due before {NowUtc}.",
-                dueReminders.Length,
-                nowUtc);
+            RemindersProcessed(logger, dueReminders.Length, nowUtc, null);
         }
     }
 }

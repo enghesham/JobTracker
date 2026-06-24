@@ -1,4 +1,4 @@
-﻿using JobTracker.Application.Common.Results;
+using JobTracker.Application.Common.Results;
 using Microsoft.AspNetCore.Mvc;
 
 namespace JobTracker.Api.Extensions;

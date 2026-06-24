@@ -1,4 +1,4 @@
-﻿namespace JobTracker.Application.Common.Results;
+namespace JobTracker.Application.Common.Results;
 
 public sealed class Result<T>
 {

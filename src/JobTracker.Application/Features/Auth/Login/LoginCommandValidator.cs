@@ -1,4 +1,4 @@
-﻿using FluentValidation;
+using FluentValidation;
 
 namespace JobTracker.Application.Features.Auth.Login;
 

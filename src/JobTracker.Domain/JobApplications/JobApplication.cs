@@ -13,7 +13,7 @@ public sealed class JobApplication : BaseEntity
     public const int SourceUrlMaxLength = 1000;
     public const int NotesMaxLength = 4000;
 
-    private static readonly IReadOnlyDictionary<JobApplicationStatus, JobApplicationStatus[]> AllowedTransitions =
+    private static readonly Dictionary<JobApplicationStatus, JobApplicationStatus[]> AllowedTransitions =
         new Dictionary<JobApplicationStatus, JobApplicationStatus[]>
         {
             [JobApplicationStatus.Draft] = new[] { JobApplicationStatus.Applied, JobApplicationStatus.Withdrawn },
@@ -117,3 +117,4 @@ public sealed class JobApplication : BaseEntity
         Notes = DomainGuard.Optional(notes, nameof(notes), NotesMaxLength);
     }
 }
+

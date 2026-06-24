@@ -1,3 +1,6 @@
+using System.Globalization;
+using System.Text;
+using System.Threading.RateLimiting;
 using JobTracker.Api.Configuration;
 using JobTracker.Api.Middleware;
 using JobTracker.Api.Services;
@@ -8,8 +11,6 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.IdentityModel.Tokens;
-using System.Text;
-using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -61,7 +62,7 @@ builder.Services.AddRateLimiter(options =>
 
         if (context.Lease.TryGetMetadata(MetadataName.RetryAfter, out var retryAfter))
         {
-            context.HttpContext.Response.Headers.RetryAfter = Math.Ceiling(retryAfter.TotalSeconds).ToString();
+            context.HttpContext.Response.Headers.RetryAfter = Math.Ceiling(retryAfter.TotalSeconds).ToString(CultureInfo.InvariantCulture);
         }
 
         context.HttpContext.Response.StatusCode = StatusCodes.Status429TooManyRequests;
@@ -124,3 +125,4 @@ static string GetClientPartition(HttpContext context, string policyName)
 
     return $"{policyName}:{clientIp}";
 }
+

@@ -1,4 +1,4 @@
-﻿namespace JobTracker.Domain.JobApplications;
+namespace JobTracker.Domain.JobApplications;
 
 public enum JobApplicationStatus
 {
