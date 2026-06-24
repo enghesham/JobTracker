@@ -20,12 +20,12 @@ public static class DependencyInjection
         if (provider == "PostgreSql")
         {
             services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseNpgsql(configuration.GetConnectionString("PostgreSql")));
+                options.UseNpgsql(GetRequiredConnectionString(configuration, "PostgreSql")));
         }
         else if (provider == "SqlServer")
         {
             services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(configuration.GetConnectionString("SqlServer")));
+                options.UseSqlServer(GetRequiredConnectionString(configuration, "SqlServer")));
         }
         else
         {
@@ -42,5 +42,12 @@ public static class DependencyInjection
         services.AddHostedService<FollowUpReminderWorker>();
 
         return services;
+    }
+
+    private static string GetRequiredConnectionString(IConfiguration configuration, string name)
+    {
+        return configuration.GetConnectionString(name)
+            ?? throw new InvalidOperationException(
+                $"ConnectionStrings:{name} is not configured. Use User Secrets for local development or an environment variable such as ConnectionStrings__{name}.");
     }
 }
