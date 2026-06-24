@@ -1,4 +1,4 @@
-﻿using JobTracker.Application.Common.Interfaces;
+using JobTracker.Application.Features.Companies.Common;
 using JobTracker.Domain.Companies;
 using Microsoft.EntityFrameworkCore;
 
@@ -25,3 +25,4 @@ public sealed class CompanyStore(ApplicationDbContext dbContext) : ICompanyStore
         dbContext.Companies.Add(company);
     }
 }
+

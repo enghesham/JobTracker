@@ -1,6 +1,6 @@
-﻿using JobTracker.Domain.Users;
+using JobTracker.Domain.Users;
 
-namespace JobTracker.Application.Common.Interfaces;
+namespace JobTracker.Application.Features.Auth.Common;
 
 public interface IUserStore
 {

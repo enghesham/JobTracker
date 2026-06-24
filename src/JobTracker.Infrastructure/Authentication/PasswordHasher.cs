@@ -1,4 +1,4 @@
-﻿using JobTracker.Application.Common.Interfaces;
+using JobTracker.Application.Features.Auth.Common;
 
 namespace JobTracker.Infrastructure.Authentication;
 
@@ -9,3 +9,4 @@ public sealed class PasswordHasher : IPasswordHasher
     public bool Verify(string password, string passwordHash) =>
         BCrypt.Net.BCrypt.Verify(password, passwordHash);
 }
+

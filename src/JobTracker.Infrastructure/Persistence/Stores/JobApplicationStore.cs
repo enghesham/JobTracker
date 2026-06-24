@@ -1,4 +1,4 @@
-﻿using JobTracker.Application.Common.Interfaces;
+using JobTracker.Application.Features.JobApplications.Common;
 using JobTracker.Domain.JobApplications;
 using Microsoft.EntityFrameworkCore;
 
@@ -18,3 +18,4 @@ public sealed class JobApplicationStore(ApplicationDbContext dbContext) : IJobAp
         dbContext.JobApplications.Add(jobApplication);
     }
 }
+

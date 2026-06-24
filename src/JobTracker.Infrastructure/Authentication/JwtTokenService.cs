@@ -1,6 +1,6 @@
 using System.Security.Claims;
 using System.Text;
-using JobTracker.Application.Common.Interfaces;
+using JobTracker.Application.Features.Auth.Common;
 using JobTracker.Domain.Users;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.JsonWebTokens;
@@ -42,3 +42,4 @@ public sealed class JwtTokenService(IConfiguration configuration, TimeProvider t
         return new JsonWebTokenHandler().CreateToken(descriptor);
     }
 }
+

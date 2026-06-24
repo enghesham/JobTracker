@@ -1,6 +1,6 @@
-﻿using JobTracker.Application.Common.Interfaces;
 using JobTracker.Application.Common.Results;
 using JobTracker.Application.Features.Auth;
+using JobTracker.Application.Features.Auth.Common;
 using JobTracker.Domain.Users;
 using MediatR;
 
@@ -29,3 +29,4 @@ public sealed class LoginCommandHandler(
         return new AuthResponse(user.Id, user.FullName, user.Email, jwtTokenService.CreateToken(user));
     }
 }
+

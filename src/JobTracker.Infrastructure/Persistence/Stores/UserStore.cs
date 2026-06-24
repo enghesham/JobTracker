@@ -1,4 +1,4 @@
-﻿using JobTracker.Application.Common.Interfaces;
+using JobTracker.Application.Features.Auth.Common;
 using JobTracker.Domain.Users;
 using Microsoft.EntityFrameworkCore;
 
@@ -23,3 +23,4 @@ public sealed class UserStore(ApplicationDbContext dbContext) : IUserStore
         dbContext.Users.Add(user);
     }
 }
+

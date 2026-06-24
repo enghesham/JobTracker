@@ -1,5 +1,6 @@
 using JobTracker.Application.Common.Interfaces;
 using JobTracker.Application.Common.Results;
+using JobTracker.Application.Features.Companies.Common;
 using JobTracker.Application.Features.JobApplications.Common;
 using JobTracker.Domain.JobApplications;
 using MediatR;
@@ -54,3 +55,4 @@ public sealed class UpdateJobApplicationStatusCommandHandler(
             jobApplication.Notes);
     }
 }
+

@@ -1,4 +1,5 @@
 using JobTracker.Application.Common.Interfaces;
+using JobTracker.Application.Features.Auth.Common;
 using JobTracker.Application.Features.Companies.Common;
 using JobTracker.Application.Features.JobApplications.Common;
 using JobTracker.Infrastructure.Authentication;
@@ -64,3 +65,4 @@ public static class DependencyInjection
                 $"ConnectionStrings:{name} is not configured. Use User Secrets for local development or an environment variable such as ConnectionStrings__{name}.");
     }
 }
+

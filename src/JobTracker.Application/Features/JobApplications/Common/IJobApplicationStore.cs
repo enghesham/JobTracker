@@ -1,6 +1,6 @@
-﻿using JobTracker.Domain.JobApplications;
+using JobTracker.Domain.JobApplications;
 
-namespace JobTracker.Application.Common.Interfaces;
+namespace JobTracker.Application.Features.JobApplications.Common;
 
 public interface IJobApplicationStore
 {

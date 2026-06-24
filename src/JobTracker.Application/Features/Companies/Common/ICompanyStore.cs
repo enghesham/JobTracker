@@ -1,6 +1,6 @@
-﻿using JobTracker.Domain.Companies;
+using JobTracker.Domain.Companies;
 
-namespace JobTracker.Application.Common.Interfaces;
+namespace JobTracker.Application.Features.Companies.Common;
 
 public interface ICompanyStore
 {

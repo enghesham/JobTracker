@@ -1,4 +1,4 @@
-﻿namespace JobTracker.Application.Common.Interfaces;
+namespace JobTracker.Application.Features.Auth.Common;
 
 public interface IPasswordHasher
 {
