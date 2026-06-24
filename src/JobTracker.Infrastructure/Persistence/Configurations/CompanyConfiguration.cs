@@ -15,10 +15,25 @@ public sealed class CompanyConfiguration : IEntityTypeConfiguration<Company>
             .HasMaxLength(200)
             .IsRequired();
 
+        builder.Property(company => company.NormalizedName)
+            .HasMaxLength(200)
+            .IsRequired();
+
         builder.Property(company => company.Website)
+            .HasMaxLength(500);
+
+        builder.Property(company => company.NormalizedWebsite)
             .HasMaxLength(500);
 
         builder.Property(company => company.Location)
             .HasMaxLength(200);
+
+        builder.HasIndex(company => new { company.UserId, company.NormalizedName })
+            .IsUnique();
+
+        builder.HasOne(company => company.User)
+            .WithMany(user => user.Companies)
+            .HasForeignKey(company => company.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

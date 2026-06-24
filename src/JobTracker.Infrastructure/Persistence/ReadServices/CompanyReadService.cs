@@ -6,10 +6,11 @@ namespace JobTracker.Infrastructure.Persistence.ReadServices;
 
 public sealed class CompanyReadService(ApplicationDbContext dbContext) : ICompanyReadService
 {
-    public async Task<IReadOnlyCollection<CompanyDto>> GetCompaniesAsync(CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyCollection<CompanyDto>> GetCompaniesAsync(Guid userId, CancellationToken cancellationToken = default)
     {
         return await dbContext.Companies
             .AsNoTracking()
+            .Where(company => company.UserId == userId)
             .OrderBy(company => company.Name)
             .Select(company => new CompanyDto(
                 company.Id,

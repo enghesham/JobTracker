@@ -2,5 +2,5 @@
 
 public interface ICompanyReadService
 {
-    Task<IReadOnlyCollection<CompanyDto>> GetCompaniesAsync(CancellationToken cancellationToken = default);
+    Task<IReadOnlyCollection<CompanyDto>> GetCompaniesAsync(Guid userId, CancellationToken cancellationToken = default);
 }

@@ -21,8 +21,8 @@ public sealed class CreateJobApplicationCommandHandler(
     public async Task<JobApplicationDto> Handle(CreateJobApplicationCommand request, CancellationToken cancellationToken)
     {
         var userId = currentUserService.UserId ?? throw new UnauthorizedAccessException("User is not authenticated.");
-        var company = dbContext.Companies.FirstOrDefault(candidate => candidate.Id == request.CompanyId)
-            ?? throw new InvalidOperationException("Company was not found.");
+        var company = dbContext.Companies.FirstOrDefault(candidate => candidate.Id == request.CompanyId && candidate.UserId == userId)
+            ?? throw new InvalidOperationException("Company was not found for the current user.");
 
         var jobApplication = new JobApplication(
             userId,
