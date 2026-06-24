@@ -1,3 +1,4 @@
+using JobTracker.Infrastructure.Observability;
 using JobTracker.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -17,7 +18,19 @@ public sealed class FollowUpReminderWorker(
 
         while (!stoppingToken.IsCancellationRequested && await timer.WaitForNextTickAsync(stoppingToken))
         {
-            await ProcessDueReminders(stoppingToken);
+            try
+            {
+                await ProcessDueReminders(stoppingToken);
+            }
+            catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
+            {
+                throw;
+            }
+            catch (Exception exception)
+            {
+                InfrastructureDiagnostics.ReminderFailureCount.Add(1);
+                logger.LogError(exception, "Follow-up reminder processing failed.");
+            }
         }
     }
 
@@ -40,6 +53,14 @@ public sealed class FollowUpReminderWorker(
         if (dueReminders.Length > 0)
         {
             await dbContext.SaveChangesAsync(cancellationToken);
+            InfrastructureDiagnostics.ReminderSuccessCount.Add(
+                dueReminders.Length,
+                new KeyValuePair<string, object?>("result", "sent"));
+
+            logger.LogInformation(
+                "Processed {ReminderCount} follow-up reminders due before {NowUtc}.",
+                dueReminders.Length,
+                nowUtc);
         }
     }
 }

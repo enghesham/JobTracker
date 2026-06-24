@@ -21,6 +21,7 @@ public static class DependencyInjection
     {
         services.TryAddSingleton(TimeProvider.System);
         services.AddSingleton<AuditingSaveChangesInterceptor>();
+        services.AddSingleton<DatabaseMetricsInterceptor>();
 
         var provider = configuration["Database:Provider"];
 
@@ -29,14 +30,18 @@ public static class DependencyInjection
             services.AddDbContext<ApplicationDbContext>((serviceProvider, options) =>
                 options
                     .UseNpgsql(GetRequiredConnectionString(configuration, "PostgreSql"))
-                    .AddInterceptors(serviceProvider.GetRequiredService<AuditingSaveChangesInterceptor>()));
+                    .AddInterceptors(
+                        serviceProvider.GetRequiredService<AuditingSaveChangesInterceptor>(),
+                        serviceProvider.GetRequiredService<DatabaseMetricsInterceptor>()));
         }
         else if (provider == "SqlServer")
         {
             services.AddDbContext<ApplicationDbContext>((serviceProvider, options) =>
                 options
                     .UseSqlServer(GetRequiredConnectionString(configuration, "SqlServer"))
-                    .AddInterceptors(serviceProvider.GetRequiredService<AuditingSaveChangesInterceptor>()));
+                    .AddInterceptors(
+                        serviceProvider.GetRequiredService<AuditingSaveChangesInterceptor>(),
+                        serviceProvider.GetRequiredService<DatabaseMetricsInterceptor>()));
         }
         else
         {
@@ -65,4 +70,5 @@ public static class DependencyInjection
                 $"ConnectionStrings:{name} is not configured. Use User Secrets for local development or an environment variable such as ConnectionStrings__{name}.");
     }
 }
+
 

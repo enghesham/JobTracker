@@ -1,4 +1,4 @@
-﻿using JobTracker.Api.Middleware;
+using JobTracker.Api.Middleware;
 using JobTracker.Api.Services;
 using JobTracker.Application;
 using JobTracker.Application.Common.Interfaces;
@@ -44,6 +44,7 @@ builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
+app.UseMiddleware<CorrelationIdMiddleware>();
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 if (app.Environment.IsDevelopment())
@@ -59,3 +60,4 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
