@@ -1,4 +1,5 @@
-﻿using JobTracker.Application.Features.Auth;
+using JobTracker.Api.Extensions;
+using JobTracker.Application.Features.Auth;
 using JobTracker.Application.Features.Auth.Login;
 using JobTracker.Application.Features.Auth.Register;
 using MediatR;
@@ -14,13 +15,16 @@ public sealed class AuthController(IMediator mediator) : ControllerBase
     public async Task<ActionResult<AuthResponse>> Register(RegisterCommand command, CancellationToken cancellationToken)
     {
         var response = await mediator.Send(command, cancellationToken);
-        return CreatedAtAction(nameof(Register), new { id = response.UserId }, response);
+        return this.CreatedAtActionResult(
+            response,
+            nameof(Register),
+            response.IsSuccess ? new { id = response.Value.UserId } : null);
     }
 
     [HttpPost("login")]
     public async Task<ActionResult<AuthResponse>> Login(LoginCommand command, CancellationToken cancellationToken)
     {
         var response = await mediator.Send(command, cancellationToken);
-        return Ok(response);
+        return this.ToActionResult(response);
     }
 }

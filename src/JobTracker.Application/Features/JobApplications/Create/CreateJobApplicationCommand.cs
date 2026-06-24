@@ -1,4 +1,5 @@
 ﻿using JobTracker.Application.Common.Interfaces;
+using JobTracker.Application.Common.Results;
 using JobTracker.Application.Features.JobApplications.Common;
 using JobTracker.Domain.JobApplications;
 using MediatR;
@@ -12,22 +13,36 @@ public sealed record CreateJobApplicationCommand(
     string? Location,
     string? SourceUrl,
     DateTime? FollowUpOnUtc,
-    string? Notes) : IRequest<JobApplicationDto>;
+    string? Notes) : IRequest<Result<JobApplicationDto>>;
 
 public sealed class CreateJobApplicationCommandHandler(
     ICompanyStore companyStore,
     IJobApplicationStore jobApplicationStore,
     IUnitOfWork unitOfWork,
-    ICurrentUserService currentUserService) : IRequestHandler<CreateJobApplicationCommand, JobApplicationDto>
+    ICurrentUserService currentUserService) : IRequestHandler<CreateJobApplicationCommand, Result<JobApplicationDto>>
 {
-    public async Task<JobApplicationDto> Handle(CreateJobApplicationCommand request, CancellationToken cancellationToken)
+    public async Task<Result<JobApplicationDto>> Handle(CreateJobApplicationCommand request, CancellationToken cancellationToken)
     {
-        var userId = currentUserService.UserId ?? throw new UnauthorizedAccessException("User is not authenticated.");
-        var company = await companyStore.GetForUserAsync(request.CompanyId, userId, cancellationToken)
-            ?? throw new InvalidOperationException("Company was not found for the current user.");
+        var userId = currentUserService.UserId;
+        if (!userId.HasValue)
+        {
+            return Result<JobApplicationDto>.Failure(Error.Unauthorized(
+                "user-not-authenticated",
+                "User is not authenticated",
+                "The current request does not contain an authenticated user."));
+        }
+
+        var company = await companyStore.GetForUserAsync(request.CompanyId, userId.Value, cancellationToken);
+        if (company is null)
+        {
+            return Result<JobApplicationDto>.Failure(Error.NotFound(
+                "company-not-found",
+                "Company not found",
+                "The requested company does not exist for the current user."));
+        }
 
         var jobApplication = new JobApplication(
-            userId,
+            userId.Value,
             request.CompanyId,
             request.JobTitle,
             request.SourceUrl,

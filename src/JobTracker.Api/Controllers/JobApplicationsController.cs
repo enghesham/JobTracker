@@ -1,4 +1,5 @@
-﻿using JobTracker.Application.Features.JobApplications.Common;
+using JobTracker.Api.Extensions;
+using JobTracker.Application.Features.JobApplications.Common;
 using JobTracker.Application.Features.JobApplications.Create;
 using JobTracker.Application.Features.JobApplications.GetMine;
 using JobTracker.Application.Features.JobApplications.UpdateStatus;
@@ -17,14 +18,17 @@ public sealed class JobApplicationsController(IMediator mediator) : ControllerBa
     public async Task<ActionResult<IReadOnlyCollection<JobApplicationDto>>> GetMine(CancellationToken cancellationToken)
     {
         var applications = await mediator.Send(new GetMyJobApplicationsQuery(), cancellationToken);
-        return Ok(applications);
+        return this.ToActionResult(applications);
     }
 
     [HttpPost]
     public async Task<ActionResult<JobApplicationDto>> Create(CreateJobApplicationCommand command, CancellationToken cancellationToken)
     {
         var application = await mediator.Send(command, cancellationToken);
-        return CreatedAtAction(nameof(GetMine), new { id = application.Id }, application);
+        return this.CreatedAtActionResult(
+            application,
+            nameof(GetMine),
+            application.IsSuccess ? new { id = application.Value.Id } : null);
     }
 
     [HttpPatch("{id:guid}/status")]
@@ -37,6 +41,6 @@ public sealed class JobApplicationsController(IMediator mediator) : ControllerBa
             new UpdateJobApplicationStatusCommand(id, request.Status),
             cancellationToken);
 
-        return Ok(application);
+        return this.ToActionResult(application);
     }
 }

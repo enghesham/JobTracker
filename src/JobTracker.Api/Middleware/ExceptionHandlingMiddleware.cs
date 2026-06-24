@@ -1,6 +1,6 @@
-﻿using System.Net;
 using JobTracker.Application.Common.Exceptions;
 using JobTracker.Domain.Common;
+using Microsoft.AspNetCore.Mvc;
 
 namespace JobTracker.Api.Middleware;
 
@@ -25,27 +25,42 @@ public sealed class ExceptionHandlingMiddleware(RequestDelegate next, ILogger<Ex
 
     private static Task WriteErrorResponse(HttpContext context, Exception exception)
     {
-        if (exception is AppValidationException validationException)
+        var (statusCode, code, title, detail) = exception switch
         {
-            context.Response.StatusCode = StatusCodes.Status400BadRequest;
-            return context.Response.WriteAsJsonAsync(new
-            {
-                title = "Validation failed.",
-                status = StatusCodes.Status400BadRequest,
-                errors = validationException.Errors
-            });
-        }
-
-        var (statusCode, message) = exception switch
-        {
-            UnauthorizedAccessException => (HttpStatusCode.Unauthorized, exception.Message),
-            DomainException => (HttpStatusCode.BadRequest, exception.Message),
-            InvalidOperationException => (HttpStatusCode.BadRequest, exception.Message),
-            KeyNotFoundException => (HttpStatusCode.NotFound, exception.Message),
-            _ => (HttpStatusCode.InternalServerError, "An unexpected error occurred.")
+            AppValidationException => (
+                StatusCodes.Status400BadRequest,
+                "validation-failed",
+                "Validation failed",
+                "One or more validation errors occurred."),
+            DomainException => (
+                StatusCodes.Status400BadRequest,
+                "domain-rule-violated",
+                "Domain rule violated",
+                exception.Message),
+            _ => (
+                StatusCodes.Status500InternalServerError,
+                "unexpected-error",
+                "Unexpected error",
+                "An unexpected error occurred.")
         };
 
-        context.Response.StatusCode = (int)statusCode;
-        return context.Response.WriteAsJsonAsync(new { error = message });
+        var problemDetails = new ProblemDetails
+        {
+            Type = $"https://errors.jobtracker.dev/{code}",
+            Title = title,
+            Status = statusCode,
+            Detail = detail
+        };
+
+        problemDetails.Extensions["code"] = code;
+        problemDetails.Extensions["traceId"] = context.TraceIdentifier;
+
+        if (exception is AppValidationException validationException)
+        {
+            problemDetails.Extensions["errors"] = validationException.Errors;
+        }
+
+        context.Response.StatusCode = statusCode;
+        return context.Response.WriteAsJsonAsync(problemDetails);
     }
 }

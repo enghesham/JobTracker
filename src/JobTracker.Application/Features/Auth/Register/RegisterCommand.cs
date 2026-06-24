@@ -1,25 +1,29 @@
 ﻿using JobTracker.Application.Common.Interfaces;
+using JobTracker.Application.Common.Results;
 using JobTracker.Application.Features.Auth;
 using JobTracker.Domain.Users;
 using MediatR;
 
 namespace JobTracker.Application.Features.Auth.Register;
 
-public sealed record RegisterCommand(string FullName, string Email, string Password) : IRequest<AuthResponse>;
+public sealed record RegisterCommand(string FullName, string Email, string Password) : IRequest<Result<AuthResponse>>;
 
 public sealed class RegisterCommandHandler(
     IUserStore userStore,
     IUnitOfWork unitOfWork,
     IPasswordHasher passwordHasher,
-    IJwtTokenService jwtTokenService) : IRequestHandler<RegisterCommand, AuthResponse>
+    IJwtTokenService jwtTokenService) : IRequestHandler<RegisterCommand, Result<AuthResponse>>
 {
-    public async Task<AuthResponse> Handle(RegisterCommand request, CancellationToken cancellationToken)
+    public async Task<Result<AuthResponse>> Handle(RegisterCommand request, CancellationToken cancellationToken)
     {
         var email = User.NormalizeEmail(request.Email);
 
         if (await userStore.EmailExistsAsync(email, cancellationToken))
         {
-            throw new InvalidOperationException("Email is already registered.");
+            return Result<AuthResponse>.Failure(Error.Conflict(
+                "email-already-registered",
+                "Email already registered",
+                "The provided email address is already registered."));
         }
 
         var user = new User(
