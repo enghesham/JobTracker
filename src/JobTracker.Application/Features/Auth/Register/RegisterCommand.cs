@@ -22,9 +22,9 @@ public sealed class RegisterCommandHandler(
         if (await userStore.EmailExistsAsync(email, cancellationToken))
         {
             return Result<AuthResponse>.Failure(Error.Conflict(
-                "email-already-registered",
-                "Email already registered",
-                "The provided email address is already registered."));
+                "registration-unavailable",
+                "Registration unavailable",
+                "The registration request cannot be completed with the provided credentials."));
         }
 
         var user = new User(
@@ -38,4 +38,3 @@ public sealed class RegisterCommandHandler(
         return new AuthResponse(user.Id, user.FullName, user.Email, jwtTokenService.CreateToken(user));
     }
 }
-

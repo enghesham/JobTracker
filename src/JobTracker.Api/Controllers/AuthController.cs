@@ -1,9 +1,11 @@
+using JobTracker.Api.Configuration;
 using JobTracker.Api.Extensions;
 using JobTracker.Application.Features.Auth;
 using JobTracker.Application.Features.Auth.Login;
 using JobTracker.Application.Features.Auth.Register;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace JobTracker.Api.Controllers;
 
@@ -12,6 +14,7 @@ namespace JobTracker.Api.Controllers;
 public sealed class AuthController(IMediator mediator) : ControllerBase
 {
     [HttpPost("register")]
+    [EnableRateLimiting(AuthRateLimitPolicies.Register)]
     public async Task<ActionResult<AuthResponse>> Register(RegisterCommand command, CancellationToken cancellationToken)
     {
         var response = await mediator.Send(command, cancellationToken);
@@ -22,6 +25,7 @@ public sealed class AuthController(IMediator mediator) : ControllerBase
     }
 
     [HttpPost("login")]
+    [EnableRateLimiting(AuthRateLimitPolicies.Login)]
     public async Task<ActionResult<AuthResponse>> Login(LoginCommand command, CancellationToken cancellationToken)
     {
         var response = await mediator.Send(command, cancellationToken);
