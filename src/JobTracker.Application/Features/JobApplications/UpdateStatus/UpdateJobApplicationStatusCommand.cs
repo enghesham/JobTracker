@@ -10,20 +10,21 @@ public sealed record UpdateJobApplicationStatusCommand(Guid JobApplicationId, Jo
 public sealed record UpdateJobApplicationStatusRequest(JobApplicationStatus Status);
 
 public sealed class UpdateJobApplicationStatusCommandHandler(
-    IApplicationDbContext dbContext,
+    ICompanyStore companyStore,
+    IJobApplicationStore jobApplicationStore,
+    IUnitOfWork unitOfWork,
     ICurrentUserService currentUserService) : IRequestHandler<UpdateJobApplicationStatusCommand, JobApplicationDto>
 {
     public async Task<JobApplicationDto> Handle(UpdateJobApplicationStatusCommand request, CancellationToken cancellationToken)
     {
         var userId = currentUserService.UserId ?? throw new UnauthorizedAccessException("User is not authenticated.");
-        var jobApplication = dbContext.JobApplications
-            .FirstOrDefault(application => application.Id == request.JobApplicationId && application.UserId == userId)
+        var jobApplication = await jobApplicationStore.GetForUserAsync(request.JobApplicationId, userId, cancellationToken)
             ?? throw new InvalidOperationException("Job application was not found.");
 
         jobApplication.ChangeStatus(request.Status);
-        await dbContext.SaveChangesAsync(cancellationToken);
+        await unitOfWork.SaveChangesAsync(cancellationToken);
 
-        var company = dbContext.Companies.FirstOrDefault(candidate => candidate.Id == jobApplication.CompanyId);
+        var company = await companyStore.GetForUserAsync(jobApplication.CompanyId, userId, cancellationToken);
 
         return new JobApplicationDto(
             jobApplication.Id,

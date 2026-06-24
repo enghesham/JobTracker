@@ -1,4 +1,5 @@
-﻿using JobTracker.Application.Common.Interfaces;
+﻿using JobTracker.Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -22,12 +23,12 @@ public sealed class FollowUpReminderWorker(
     private async Task ProcessDueReminders(CancellationToken cancellationToken)
     {
         using var scope = scopeFactory.CreateScope();
-        var dbContext = scope.ServiceProvider.GetRequiredService<IApplicationDbContext>();
+        var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
         var now = DateTime.UtcNow;
 
-        var dueReminders = dbContext.FollowUpReminders
+        var dueReminders = await dbContext.FollowUpReminders
             .Where(reminder => !reminder.IsSent && reminder.RemindAtUtc <= now)
-            .ToArray();
+            .ToArrayAsync(cancellationToken);
 
         foreach (var reminder in dueReminders)
         {
@@ -41,4 +42,3 @@ public sealed class FollowUpReminderWorker(
         }
     }
 }
-

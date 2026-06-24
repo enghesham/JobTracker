@@ -10,21 +10,12 @@ using System.Reflection;
 namespace JobTracker.Infrastructure.Persistence;
 
 public sealed class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
-    : DbContext(options), IApplicationDbContext
+    : DbContext(options), IUnitOfWork
 {
     public DbSet<User> Users => Set<User>();
     public DbSet<Company> Companies => Set<Company>();
     public DbSet<JobApplication> JobApplications => Set<JobApplication>();
     public DbSet<FollowUpReminder> FollowUpReminders => Set<FollowUpReminder>();
-
-    IQueryable<User> IApplicationDbContext.Users => Users;
-    IQueryable<Company> IApplicationDbContext.Companies => Companies;
-    IQueryable<JobApplication> IApplicationDbContext.JobApplications => JobApplications;
-    IQueryable<FollowUpReminder> IApplicationDbContext.FollowUpReminders => FollowUpReminders;
-
-    void IApplicationDbContext.Add<TEntity>(TEntity entity) => Set<TEntity>().Add(entity);
-
-    void IApplicationDbContext.Remove<TEntity>(TEntity entity) => Set<TEntity>().Remove(entity);
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -52,4 +43,3 @@ public sealed class ApplicationDbContext(DbContextOptions<ApplicationDbContext> 
         return base.SaveChangesAsync(cancellationToken);
     }
 }
-

@@ -5,6 +5,7 @@ using JobTracker.Infrastructure.Authentication;
 using JobTracker.Infrastructure.BackgroundJobs;
 using JobTracker.Infrastructure.Persistence;
 using JobTracker.Infrastructure.Persistence.ReadServices;
+using JobTracker.Infrastructure.Persistence.Stores;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -32,8 +33,11 @@ public static class DependencyInjection
             throw new InvalidOperationException("Unsupported database provider.");
         }
 
-        services.AddScoped<IApplicationDbContext>(provider =>
+        services.AddScoped<IUnitOfWork>(provider =>
             provider.GetRequiredService<ApplicationDbContext>());
+        services.AddScoped<IUserStore, UserStore>();
+        services.AddScoped<ICompanyStore, CompanyStore>();
+        services.AddScoped<IJobApplicationStore, JobApplicationStore>();
 
         services.AddScoped<ICompanyReadService, CompanyReadService>();
         services.AddScoped<IJobApplicationReadService, JobApplicationReadService>();
@@ -51,3 +55,4 @@ public static class DependencyInjection
                 $"ConnectionStrings:{name} is not configured. Use User Secrets for local development or an environment variable such as ConnectionStrings__{name}.");
     }
 }
+

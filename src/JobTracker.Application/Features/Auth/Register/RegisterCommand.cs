@@ -8,26 +8,27 @@ namespace JobTracker.Application.Features.Auth.Register;
 public sealed record RegisterCommand(string FullName, string Email, string Password) : IRequest<AuthResponse>;
 
 public sealed class RegisterCommandHandler(
-    IApplicationDbContext dbContext,
+    IUserStore userStore,
+    IUnitOfWork unitOfWork,
     IPasswordHasher passwordHasher,
     IJwtTokenService jwtTokenService) : IRequestHandler<RegisterCommand, AuthResponse>
 {
     public async Task<AuthResponse> Handle(RegisterCommand request, CancellationToken cancellationToken)
     {
-        var email = request.Email.Trim().ToLowerInvariant();
+        var email = User.NormalizeEmail(request.Email);
 
-        if (dbContext.Users.Any(user => user.Email == email))
+        if (await userStore.EmailExistsAsync(email, cancellationToken))
         {
             throw new InvalidOperationException("Email is already registered.");
         }
 
         var user = new User(
-            request.FullName.Trim(),
+            request.FullName,
             email,
             passwordHasher.Hash(request.Password));
 
-        dbContext.Add(user);
-        await dbContext.SaveChangesAsync(cancellationToken);
+        userStore.Add(user);
+        await unitOfWork.SaveChangesAsync(cancellationToken);
 
         return new AuthResponse(user.Id, user.FullName, user.Email, jwtTokenService.CreateToken(user));
     }

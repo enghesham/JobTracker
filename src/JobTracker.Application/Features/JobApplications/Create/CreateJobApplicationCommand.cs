@@ -15,30 +15,32 @@ public sealed record CreateJobApplicationCommand(
     string? Notes) : IRequest<JobApplicationDto>;
 
 public sealed class CreateJobApplicationCommandHandler(
-    IApplicationDbContext dbContext,
+    ICompanyStore companyStore,
+    IJobApplicationStore jobApplicationStore,
+    IUnitOfWork unitOfWork,
     ICurrentUserService currentUserService) : IRequestHandler<CreateJobApplicationCommand, JobApplicationDto>
 {
     public async Task<JobApplicationDto> Handle(CreateJobApplicationCommand request, CancellationToken cancellationToken)
     {
         var userId = currentUserService.UserId ?? throw new UnauthorizedAccessException("User is not authenticated.");
-        var company = dbContext.Companies.FirstOrDefault(candidate => candidate.Id == request.CompanyId && candidate.UserId == userId)
+        var company = await companyStore.GetForUserAsync(request.CompanyId, userId, cancellationToken)
             ?? throw new InvalidOperationException("Company was not found for the current user.");
 
         var jobApplication = new JobApplication(
             userId,
             request.CompanyId,
-            request.JobTitle.Trim(),
-            string.IsNullOrWhiteSpace(request.SourceUrl) ? null : request.SourceUrl.Trim(),
+            request.JobTitle,
+            request.SourceUrl,
             DateTime.UtcNow);
 
         jobApplication.UpdateDetails(
-            string.IsNullOrWhiteSpace(request.JobDescription) ? null : request.JobDescription.Trim(),
-            string.IsNullOrWhiteSpace(request.Location) ? null : request.Location.Trim(),
+            request.JobDescription,
+            request.Location,
             request.FollowUpOnUtc,
-            string.IsNullOrWhiteSpace(request.Notes) ? null : request.Notes.Trim());
+            request.Notes);
 
-        dbContext.Add(jobApplication);
-        await dbContext.SaveChangesAsync(cancellationToken);
+        jobApplicationStore.Add(jobApplication);
+        await unitOfWork.SaveChangesAsync(cancellationToken);
 
         return new JobApplicationDto(
             jobApplication.Id,
