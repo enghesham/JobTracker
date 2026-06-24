@@ -12,21 +12,21 @@ public sealed class CompanyConfiguration : IEntityTypeConfiguration<Company>
         builder.HasKey(company => company.Id);
 
         builder.Property(company => company.Name)
-            .HasMaxLength(200)
+            .HasMaxLength(Company.NameMaxLength)
             .IsRequired();
 
         builder.Property(company => company.NormalizedName)
-            .HasMaxLength(200)
+            .HasMaxLength(Company.NameMaxLength)
             .IsRequired();
 
         builder.Property(company => company.Website)
-            .HasMaxLength(500);
+            .HasMaxLength(Company.WebsiteMaxLength);
 
         builder.Property(company => company.NormalizedWebsite)
-            .HasMaxLength(500);
+            .HasMaxLength(Company.WebsiteMaxLength);
 
         builder.Property(company => company.Location)
-            .HasMaxLength(200);
+            .HasMaxLength(Company.LocationMaxLength);
 
         builder.HasIndex(company => new { company.UserId, company.NormalizedName })
             .IsUnique();
@@ -35,5 +35,8 @@ public sealed class CompanyConfiguration : IEntityTypeConfiguration<Company>
             .WithMany(user => user.Companies)
             .HasForeignKey(company => company.UserId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        builder.Navigation(company => company.JobApplications)
+            .UsePropertyAccessMode(PropertyAccessMode.Field);
     }
 }

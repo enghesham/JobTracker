@@ -5,13 +5,22 @@ namespace JobTracker.Domain.FollowUpReminders;
 
 public sealed class FollowUpReminder : BaseEntity
 {
+    public const int MessageMaxLength = 1000;
+
     private FollowUpReminder() { }
 
     public FollowUpReminder(Guid jobApplicationId, DateTime remindAtUtc, string? message)
     {
+        DomainGuard.AgainstEmpty(jobApplicationId, nameof(jobApplicationId));
+
+        if (remindAtUtc == default)
+        {
+            throw new DomainException("Reminder date is required.");
+        }
+
         JobApplicationId = jobApplicationId;
         RemindAtUtc = remindAtUtc;
-        Message = message;
+        Message = DomainGuard.Optional(message, nameof(message), MessageMaxLength);
     }
 
     public Guid JobApplicationId { get; private set; }
@@ -22,6 +31,11 @@ public sealed class FollowUpReminder : BaseEntity
 
     public void MarkAsSent()
     {
+        if (IsSent)
+        {
+            return;
+        }
+
         IsSent = true;
         MarkAsUpdated();
     }

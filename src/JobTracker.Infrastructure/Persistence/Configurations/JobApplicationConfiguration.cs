@@ -12,20 +12,20 @@ public sealed class JobApplicationConfiguration : IEntityTypeConfiguration<JobAp
         builder.HasKey(application => application.Id);
 
         builder.Property(application => application.JobTitle)
-            .HasMaxLength(250)
+            .HasMaxLength(JobApplication.JobTitleMaxLength)
             .IsRequired();
 
         builder.Property(application => application.JobDescription)
-            .HasMaxLength(4000);
+            .HasMaxLength(JobApplication.JobDescriptionMaxLength);
 
         builder.Property(application => application.Location)
-            .HasMaxLength(200);
+            .HasMaxLength(JobApplication.LocationMaxLength);
 
         builder.Property(application => application.SourceUrl)
-            .HasMaxLength(1000);
+            .HasMaxLength(JobApplication.SourceUrlMaxLength);
 
         builder.Property(application => application.Notes)
-            .HasMaxLength(4000);
+            .HasMaxLength(JobApplication.NotesMaxLength);
 
         builder.Property(application => application.Status)
             .HasConversion<string>()
@@ -45,5 +45,8 @@ public sealed class JobApplicationConfiguration : IEntityTypeConfiguration<JobAp
             .WithOne(reminder => reminder.JobApplication)
             .HasForeignKey(reminder => reminder.JobApplicationId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        builder.Navigation(application => application.FollowUpReminders)
+            .UsePropertyAccessMode(PropertyAccessMode.Field);
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using JobTracker.Application.Common.Exceptions;
+using JobTracker.Domain.Common;
 
 namespace JobTracker.Api.Middleware;
 
@@ -13,7 +14,7 @@ public sealed class ExceptionHandlingMiddleware(RequestDelegate next, ILogger<Ex
         }
         catch (Exception exception)
         {
-            if (exception is not AppValidationException)
+            if (exception is not AppValidationException and not DomainException)
             {
                 logger.LogError(exception, "Unhandled request exception.");
             }
@@ -38,6 +39,7 @@ public sealed class ExceptionHandlingMiddleware(RequestDelegate next, ILogger<Ex
         var (statusCode, message) = exception switch
         {
             UnauthorizedAccessException => (HttpStatusCode.Unauthorized, exception.Message),
+            DomainException => (HttpStatusCode.BadRequest, exception.Message),
             InvalidOperationException => (HttpStatusCode.BadRequest, exception.Message),
             KeyNotFoundException => (HttpStatusCode.NotFound, exception.Message),
             _ => (HttpStatusCode.InternalServerError, "An unexpected error occurred.")
@@ -47,4 +49,3 @@ public sealed class ExceptionHandlingMiddleware(RequestDelegate next, ILogger<Ex
         return context.Response.WriteAsJsonAsync(new { error = message });
     }
 }
-

@@ -40,15 +40,16 @@ public sealed class ApplicationDbContext(DbContextOptions<ApplicationDbContext> 
         {
             if (entry.State == EntityState.Added)
             {
-                entry.Entity.CreatedAtUtc = now;
+                entry.Entity.MarkAsCreated(now);
             }
 
             if (entry.State == EntityState.Modified)
             {
-                entry.Entity.UpdatedAtUtc = now;
+                entry.Entity.MarkAsUpdated(now);
             }
         }
 
         return base.SaveChangesAsync(cancellationToken);
     }
 }
+

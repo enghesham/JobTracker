@@ -6,16 +6,24 @@ namespace JobTracker.Domain.Companies;
 
 public sealed class Company : BaseEntity
 {
+    public const int NameMaxLength = 200;
+    public const int WebsiteMaxLength = 500;
+    public const int LocationMaxLength = 200;
+
+    private readonly List<JobApplication> _jobApplications = new();
+
     private Company() { }
 
     public Company(Guid userId, string name, string? website, string? location)
     {
+        DomainGuard.AgainstEmpty(userId, nameof(userId));
+
         UserId = userId;
-        Name = name.Trim();
-        NormalizedName = NormalizeName(name);
-        Website = NormalizeWebsiteForDisplay(website);
-        NormalizedWebsite = NormalizeWebsite(website);
-        Location = string.IsNullOrWhiteSpace(location) ? null : location.Trim();
+        Name = DomainGuard.Required(name, nameof(name), NameMaxLength);
+        NormalizedName = NormalizeName(Name);
+        Website = DomainGuard.OptionalHttpUrl(website, nameof(website), WebsiteMaxLength);
+        NormalizedWebsite = NormalizeWebsite(Website);
+        Location = DomainGuard.Optional(location, nameof(location), LocationMaxLength);
     }
 
     public Guid UserId { get; private set; }
@@ -26,28 +34,14 @@ public sealed class Company : BaseEntity
     public string? NormalizedWebsite { get; private set; }
     public string? Location { get; private set; }
 
-    public ICollection<JobApplication> JobApplications { get; private set; } = new List<JobApplication>();
+    public IReadOnlyCollection<JobApplication> JobApplications => _jobApplications;
 
     public static string NormalizeName(string name) =>
-        name.Trim().ToUpperInvariant();
+        DomainGuard.Required(name, nameof(name), NameMaxLength).ToUpperInvariant();
 
     public static string? NormalizeWebsite(string? website)
     {
-        if (string.IsNullOrWhiteSpace(website))
-        {
-            return null;
-        }
-
-        return website.Trim().TrimEnd('/').ToLowerInvariant();
-    }
-
-    private static string? NormalizeWebsiteForDisplay(string? website)
-    {
-        if (string.IsNullOrWhiteSpace(website))
-        {
-            return null;
-        }
-
-        return website.Trim().TrimEnd('/');
+        var normalized = DomainGuard.OptionalHttpUrl(website, nameof(website), WebsiteMaxLength);
+        return normalized?.ToLowerInvariant();
     }
 }
