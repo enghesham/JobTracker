@@ -1,0 +1,109 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+    branches:
+      - main
+      - master
+
+permissions:
+  contents: read
+
+env:
+  DOTNET_NOLOGO: true
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+  DOTNET_VERSION: 10.0.x
+  SOLUTION: JobTracker.slnx
+  API_PROJECT: src/JobTracker.Api/JobTracker.Api.csproj
+  INFRASTRUCTURE_PROJECT: src/JobTracker.Infrastructure/JobTracker.Infrastructure.csproj
+  Database__Provider: PostgreSql
+  ConnectionStrings__PostgreSql: Host=localhost;Port=5432;Database=jobtracker_ci;Username=postgres;Password=postgres
+  Jwt__Key: ci-test-signing-key-ci-test-signing-key-32chars
+  Jwt__Issuer: JobTracker
+  Jwt__Audience: JobTracker
+  Jwt__ExpiryMinutes: 60
+
+jobs:
+  build-test-and-verify:
+    name: Build, Test, Format, Security, Migrations
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_DB: jobtracker_ci
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d jobtracker_ci"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Install EF Core CLI
+        run: dotnet tool install --global dotnet-ef --version 10.0.9
+
+      - name: Restore
+        run: dotnet restore ${{ env.SOLUTION }}
+
+      - name: Dependency vulnerability scan
+        shell: bash
+        run: |
+          set -o pipefail
+          dotnet list ${{ env.SOLUTION }} package --vulnerable --include-transitive | tee vulnerabilities.txt
+          if grep -qi "has the following vulnerable packages" vulnerabilities.txt; then
+            echo "Vulnerable NuGet packages were found."
+            exit 1
+          fi
+
+      - name: Build
+        run: dotnet build ${{ env.SOLUTION }} --no-restore --configuration Release
+
+      - name: Verify formatting
+        run: dotnet format ${{ env.SOLUTION }} --verify-no-changes --no-restore --verbosity minimal
+
+      - name: Verify EF migrations are current
+        run: >-
+          dotnet ef migrations has-pending-model-changes
+          --project ${{ env.INFRASTRUCTURE_PROJECT }}
+          --startup-project ${{ env.API_PROJECT }}
+          --context ApplicationDbContext
+          --configuration Release
+          --no-build
+
+      - name: Apply migrations to PostgreSQL
+        run: >-
+          dotnet ef database update
+          --project ${{ env.INFRASTRUCTURE_PROJECT }}
+          --startup-project ${{ env.API_PROJECT }}
+          --context ApplicationDbContext
+          --configuration Release
+          --no-build
+
+      - name: Test with PostgreSQL service
+        run: dotnet test ${{ env.SOLUTION }} --no-build --configuration Release --logger "trx;LogFileName=test-results.trx"
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: '**/TestResults/*.trx'
+          if-no-files-found: ignore
+
